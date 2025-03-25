@@ -19,12 +19,12 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
-      authorizedSshKeys =  let
-         rawKeys = builtins.readFile ./.authorized_ssh_keys;
-      in builtins.filter (key: key != "") (builtins.lines rawKeys);
-      propietarySshKeys = let
-         rawKeys = builtins.readFile ./.propietary_ssh_keys;
-      in 
+      # authorizedSshKeys =  let
+      #   rawKeys = builtins.readFile ./.authorized_ssh_keys;
+      # in builtins.filter (key: key != "") (builtins.lines rawKeys);
+      # propietarySshKeys = let
+      #   rawKeys = builtins.readFile ./.propietary_ssh_keys;
+      # in
     in
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
@@ -39,9 +39,9 @@
               "flakes"
             ];
 
-	    services.openssh = {
-  	      enable = true;
-	    };
+            services.openssh = {
+              enable = true;
+            };
 
             # WSL support
             wsl.enable = true;
@@ -51,7 +51,7 @@
               isNormalUser = true;
               extraGroups = [ "wheel" ];
               shell = pkgs.zsh;
-	      # openssh.authorizedKeys.keys = sshKeys;
+              # openssh.authorizedKeys.keys = sshKeys;
             };
 
             wsl.defaultUser = "maximo";
@@ -70,20 +70,19 @@
               # Add more aliases as needed
             };
 
-            environment.systemPackages = with pkgs; 
-	    [ 
-	    	nixfmt-rfc-style
-		gcc              # The GNU Compiler Collection
-                gnumake          # GNU Make (often just “make”)
-	        binutils         # A collection of binary tools
-	        cmake            # For C/C++ projects
-	        git              # Version control (if needed)
-	        gdb              # The GNU Debugger
-		pnpm             #
-		fnm              #
-		temurin-bin-23   #
-		rustup           #
-	    ];
+            environment.systemPackages = with pkgs; [
+              nixfmt-rfc-style
+              gcc # The GNU Compiler Collection
+              gnumake # GNU Make (often just “make”)
+              binutils # A collection of binary tools
+              cmake # For C/C++ projects
+              git # Version control (if needed)
+              gdb # The GNU Debugger
+              pnpm
+              fnm
+              temurin-bin-23
+              rustup
+            ];
 
             # Home Manager user config
             home-manager.users.maximo = {
@@ -99,10 +98,10 @@
                   theme = "";
                 };
 
-		enableCompletion = true;
-  		autosuggestion.enable = true;
-  		syntaxHighlighting.enable = true;
-		history.size = 10000;
+                enableCompletion = true;
+                autosuggestion.enable = true;
+                syntaxHighlighting.enable = true;
+                history.size = 10000;
 
                 # Define global shell aliases
                 shellAliases = {
@@ -111,14 +110,17 @@
                 };
 
                 initExtra = ''
-                  eval "$(fnm env --use-on-cd --shell zsh)"
-		'';
+                                    eval "$(fnm env --use-on-cd --shell zsh)";
+                                    export COLORTERM=truecolor;
+                  		'';
               };
 
               programs.oh-my-posh = {
                 enable = true;
                 enableZshIntegration = true;
-                settings = builtins.fromJSON (builtins.unsafeDiscardStringContext (builtins.readFile ./catpuccin_theme.json));
+                settings = builtins.fromJSON (
+                  builtins.unsafeDiscardStringContext (builtins.readFile ./catpuccin_theme.json)
+                );
               };
 
               # Enable and configure Git
@@ -136,14 +138,14 @@
               programs.tmux = {
                 enable = true;
                 clock24 = true;
-		mouse = true;
-		baseIndex = 1;
-		keyMode = "vi";
-		sensibleOnTop = true;
-		prefix = "C-Space";
-		extraConfig = ''
+                mouse = true;
+                baseIndex = 1;
+                keyMode = "vi";
+                sensibleOnTop = true;
+                prefix = "C-Space";
+                extraConfig = ''
 
-		'';
+                  		'';
               };
 
               home.stateVersion = "24.05";
