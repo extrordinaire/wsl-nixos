@@ -31,5 +31,5 @@ TODO LIST:
 - [x] Write this README.
 - [ ] Manage SSH persistance automagically from a custom path.
 - [ ] Add TPM (Temux Plugin Manager).
-- [ ] Incorportate a FHS for nvim to work its best with Lazy package manager and Mason.
+- [X] Incorportate a FHS for nvim to work its best with Lazy package manager and Mason.
 - [ ] Finish tweaking the theming and change the names.

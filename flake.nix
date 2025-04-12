@@ -25,6 +25,57 @@
       # propietarySshKeys = let
       #   rawKeys = builtins.readFile ./.propietary_ssh_keys;
       # in
+      fhsEnv = let wslinterop = builtins.getEnv "WSL_INTEROP"; in pkgs.buildFHSEnv {
+        name = "fhs-shell";
+	# unsharePid = false;  # Inherit the host's /proc instead of creating a new one.
+        targetPkgs =
+          pkgs: with pkgs; [
+            tmux
+            neovim
+            git
+            curl
+            fnm
+            python3
+            gcc
+            pkg-config
+            rustc
+            cargo
+            unzip
+          ];
+        profile = ''
+export EDITOR=nvim
+export PATH=$PATH:$HOME/.local/bin
+        '';
+        runScript = "
+#bash -c '\
+#if [ ! -f /tmp/.init_fixed ]; then \
+#    rm -f /init && ln -s /tools/init /init && touch /tmp/.init_fixed; \
+#fi; \
+#exec tmux new-session -A -s fhs-session'
+
+bash -c '\
+if [ ! -f /tmp/.init_fixed ]; then \
+    rm -f /init && ln -s /tools/init /init && touch /tmp/.init_fixed; \
+fi; \
+if [ -n \"$EXTRA_CMD\" ]; then \
+    sessname=fhs-session-$(date +%s); \
+    exec tmux new-session -A -s $sessname \"$EXTRA_CMD; tmux kill-server\"; \
+else \
+    exec tmux new-session -A -s fhs-session \"tmux kill-server\"; \
+fi'
+";
+
+	bindMounts = [ "/etc/nixos" ];
+        extraBwrapArgs = [
+    "--dir" "/tools"                                    # Create /tools directory.
+    "--ro-bind" "/init" "/tools/init"                     # Expose the host’s /init as /tools/init.
+    "--dir" "/binfmt_misc"                              # Create a dedicated directory.
+    # "--ro-bind" "/proc/sys/fs/binfmt_misc" "/binfmt_misc" # Bind host's binfmt_misc to /binfmt_misc.
+    # "--symlink" "/binfmt_misc" "/proc/sys/fs/binfmt_misc" # Symlink it to where the kernel expects.
+    "--setenv" "WSL_INTEROP" wslinterop                    # Pass through WSL_INTEROP. 
+    "--"                                                # End of options; the command will follow.
+  ];
+      };
     in
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
@@ -87,6 +138,10 @@
             # Home Manager user config
             home-manager.users.maximo = {
 
+              home = {
+                packages = [ fhsEnv ];
+              };
+
               programs.zsh = {
                 enable = true;
                 oh-my-zsh = {
@@ -110,16 +165,26 @@
                 };
 
                 initExtra = ''
-                                    eval "$(fnm env --use-on-cd --shell zsh)";
-                                    export COLORTERM=truecolor;
-                  		'';
+                                                      eval "$(fnm env --use-on-cd --shell zsh)";
+                                                      export COLORTERM=truecolor;
+                      nvimfhs() {
+                        fhs-shell -c "nvim $@"
+                      }
+                      tmuxfhs() {
+                        fhs-shell -c "tmux $@"
+                      }
+
+                  export XDG_CONFIG_HOME="$HOME/.config"
+                  export XDG_DATA_HOME="$HOME/.local/share"
+                  export XDG_CACHE_HOME="$HOME/.cache"
+                                    		'';
               };
 
               programs.oh-my-posh = {
                 enable = true;
                 enableZshIntegration = true;
                 settings = builtins.fromJSON (
-                  builtins.unsafeDiscardStringContext (builtins.readFile ./catpuccin_theme.json)
+                  builtins.unsafeDiscardStringContext (builtins.readFile ./max_simpleton_theme.json)
                 );
               };
 
