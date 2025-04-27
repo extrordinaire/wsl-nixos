@@ -16,9 +16,9 @@
           "background": "p:blue",
           "foreground": "p:wight",
           "powerline_symbol": "\ue0b4",
-          "leading_diamond": "\u2593",
+          "leading_diamond": "\ue0b6",
           "style": "diamond",
-          "template": " {{.Icon}} ",
+          "template": "{{.Icon}} ",
           "type": "os"
         },
         {
@@ -26,7 +26,7 @@
           "foreground": "p:text",
           "powerline_symbol": "\ue0b4",
           "style": "diamond",
-          "template": " {{ .UserName }}@{{ .HostName }} ",
+          "template": "{{ .UserName }}@{{ .HostName }}",
           "type": "session"
         },
         {
@@ -37,15 +37,15 @@
             "home_icon": "~",
             "style": "agnoster_short",
             "mapped_locations": {
-              "/mnt/c": "\ue62a",
-              "/mnt/c/*": "\ue62a",
-              "/mnt/d": "\uf0a0",
-              "/mnt/d/*": "\uf0a0"
+              "/mnt/c": "\ue62a C://",
+              "/mnt/c/*": "\ue62a C://",
+              "/mnt/d": "\uf0a0 D://",
+              "/mnt/d/*": "\uf0a0 D://"
             }
           },
-          "powerline_symbol": "\ue0bc",
+          "powerline_symbol": "\ue0b4",
           "style": "powerline",
-          "template": " \ue0cf {{ .Path }} ",
+          "template": " {{ .Path }}",
           "type": "path"
         },
         {
